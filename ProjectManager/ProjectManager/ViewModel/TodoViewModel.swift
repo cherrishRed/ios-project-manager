@@ -46,4 +46,10 @@ class TodoViewModel: ObservableObject {
     willChangeTodo.first?.title = todo.title
     willChangeTodo.first?.date  = todo.date
   }
+  
+  func delete(set: IndexSet) {
+    for index in set {
+      todoList.remove(at: index)
+    }
+  }
 }

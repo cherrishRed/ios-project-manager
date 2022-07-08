@@ -24,6 +24,7 @@ struct TodoListView: View {
             DetailViewButton(viewModel: viewModel, todo: todo, isShowDetailView: $isShowDetailView)
               .listRowSeparator(.hidden)
           }
+          .onDelete(perform: viewModel.delete )
         }
         .padding(.horizontal, -24)
         .listStyle(.inset)
@@ -44,9 +45,6 @@ struct DetailViewButton: View {
   
   var body: some View {
     Button {
-      if isLongPressing {
-        isLongPressing = false
-      }
     
     } label: {
       TodoListCell(todo)
@@ -57,13 +55,11 @@ struct DetailViewButton: View {
     .popover(isPresented: $isLongPressing) {
         TodoListPopOver()
     }
-    .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded({ _ in
-      print("long")
-      self.isLongPressing = true
-    }))
-    .simultaneousGesture(TapGesture().onEnded {
+    .onTapGesture {
       isShowDetailView = true
-      
+    }
+    .onLongPressGesture(minimumDuration: 1,perform: {
+      isLongPressing = true
     })
   }
 }
