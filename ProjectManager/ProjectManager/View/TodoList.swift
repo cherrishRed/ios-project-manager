@@ -40,6 +40,7 @@ struct DetailViewButton: View {
   @ObservedObject var todo: Todo
   @Binding var isShowDetailView: Bool
   @State var isLongPressing = false
+  @State private var isShowingPopover = false
   
   var body: some View {
     Button {
@@ -53,13 +54,16 @@ struct DetailViewButton: View {
     .sheet(isPresented: $isShowDetailView) {
       DetailView(viewModel: viewModel, todo: todo, isShow: $isShowDetailView, method: .update)
     }
-    .simultaneousGesture(LongPressGesture(minimumDuration: 2).onEnded({ _ in
+    .popover(isPresented: $isLongPressing) {
+        TodoListPopOver()
+    }
+    .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded({ _ in
       print("long")
       self.isLongPressing = true
     }))
     .simultaneousGesture(TapGesture().onEnded {
       isShowDetailView = true
-
+      
     })
   }
 }
