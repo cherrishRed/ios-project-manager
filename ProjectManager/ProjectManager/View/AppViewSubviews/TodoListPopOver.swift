@@ -8,28 +8,28 @@
 import SwiftUI
 
 struct TodoListPopOver: View {
-  @Binding var isShow: Bool
   let todo: Todo
-  private let updata: (Status, Todo) -> Void
+  @Binding var isShow: Bool
+  @ObservedObject var viewModel: ListViewModel
   
-  init(isShow: Binding<Bool>, todo: Todo, updata: @escaping (Status, Todo) -> Void) {
+  init(isShow: Binding<Bool>, viewModel: ListViewModel, todo: Todo) {
     self._isShow = isShow
+    self.viewModel = viewModel
     self.todo = todo
-    self.updata = updata
   }
   
   var body: some View {
     VStack {
       switch todo.status {
       case .todo:
-        MoveButton(isShow: $isShow, todo: todo, status: .doing, updata: updata)
-        MoveButton(isShow: $isShow, todo: todo, status: .done, updata: updata)
+        MoveButton(isShow: $isShow, viewModel: viewModel, todo: todo, status: .doing)
+        MoveButton(isShow: $isShow, viewModel: viewModel, todo: todo, status: .done)
       case .doing:
-        MoveButton(isShow: $isShow, todo: todo, status: .todo, updata: updata)
-        MoveButton(isShow: $isShow, todo: todo, status: .done, updata: updata)
+        MoveButton(isShow: $isShow, viewModel: viewModel, todo: todo, status: .todo)
+        MoveButton(isShow: $isShow, viewModel: viewModel, todo: todo, status: .done)
       case .done:
-        MoveButton(isShow: $isShow, todo: todo, status: .todo, updata: updata)
-        MoveButton(isShow: $isShow, todo: todo, status: .doing, updata: updata)
+        MoveButton(isShow: $isShow, viewModel: viewModel, todo: todo, status: .todo)
+        MoveButton(isShow: $isShow, viewModel: viewModel, todo: todo, status: .doing)
       }
     }
     .padding()
@@ -37,21 +37,22 @@ struct TodoListPopOver: View {
 }
 
 struct MoveButton: View {
+  @ObservedObject var viewModel: ListViewModel
   @Binding var isShow: Bool
   let todo: Todo
   let status: Status
-  private let updata: (Status, Todo) -> Void
   
-  init(isShow: Binding<Bool>, todo: Todo, status: Status, updata: @escaping (Status, Todo) -> Void) {
+  init(isShow: Binding<Bool>, viewModel: ListViewModel, todo: Todo, status: Status) {
     self._isShow = isShow
     self.todo = todo
+    self.viewModel = viewModel
     self.status = status
-    self.updata = updata
   }
   
   var body: some View {
     Button("MOVE to \(status.rawValue)") {
-      updata(status, todo)
+      viewModel.changedStatus(status, todo)
+//      viewModel.changeStatus(status: status, todo: todo)
       isShow = false
     }
     .buttonStyle(GrayBasicButtonStyle())

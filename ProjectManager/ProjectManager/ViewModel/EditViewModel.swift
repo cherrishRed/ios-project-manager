@@ -8,6 +8,7 @@
 import Foundation
 
 class EditViewModel: ObservableObject {
+  @Published var nonEditable: Bool = true
   var update: (Todo) -> Void
   
   init(update: @escaping (Todo) -> Void) {

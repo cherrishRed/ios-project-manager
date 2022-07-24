@@ -9,7 +9,6 @@ import SwiftUI
 
 struct CreateView: View {
   @State var todo = Todo(title: "", content: "")
-  @Binding var isShow: Bool
   @ObservedObject var viewModel: CreateViewModel
   
   var body: some View {
@@ -18,13 +17,12 @@ struct CreateView: View {
         .toolbar {
           ToolbarItem(placement: .navigationBarLeading) {
             Button("Calcel") {
-              isShow = false
+              viewModel.cancel()
             }
           }
           ToolbarItem(placement: .navigationBarTrailing) {
             Button("Done") {
               viewModel.create(todo)
-              isShow = false
             }
           }
         }

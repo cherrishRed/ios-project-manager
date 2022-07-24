@@ -8,33 +8,28 @@ import SwiftUI
 
 struct TodoListView: View {
   @ObservedObject var viewModel: ListViewModel
-  private let status: Status
-  private let updata: (Status, Todo) -> Void
-
-  init(viewModel: ListViewModel,
-       todoService: TodoService,
-       status: Status,
-       updata: @escaping (Status, Todo) -> Void
+  private let updata: () -> Void
+  
+  init(viewModel: ListViewModel, updata: @escaping () -> Void
   ) {
     self.viewModel = viewModel
-    self.status = status
     self.updata = updata
   }
   
   var body: some View {
     
     VStack(spacing: 0) {
-      HeaderView(title: status, listCount: viewModel.read(by: status).count)
+      HeaderView(title: viewModel.status, listCount: viewModel.read().count)
       
       ZStack {
         Color(UIColor.systemGray5)
         List {
-          ForEach(viewModel.read(by: status)) { todo in
-            ListCellView(todo: todo, viewModel: viewModel, updata: updata)
+          ForEach(viewModel.read()) { todo in
+            ListCellView(todo: todo, viewModel: viewModel)
               .listRowSeparator(.hidden)
           }
           .onDelete { index in
-            viewModel.delete(set: index, status: status)
+            viewModel.delete(set: index)
           }
         }
         .padding(.horizontal, -24)
@@ -51,13 +46,10 @@ struct ListCellView: View {
   @State var isLongPressing = false
   @State var isShowEditView = false
   @ObservedObject var viewModel: ListViewModel
-
   let todo: Todo
-  private let updata: (Status, Todo) -> Void
   
-  init(todo: Todo, viewModel: ListViewModel, updata: @escaping (Status, Todo) -> Void) {
+  init(todo: Todo, viewModel: ListViewModel) {
     self.todo = todo
-    self.updata = updata
     self.viewModel = viewModel
   }
   
@@ -67,16 +59,16 @@ struct ListCellView: View {
         isShowEditView = true
       })
       .onLongPressGesture(perform: {
-        self.isLongPressing = true
+        isLongPressing = true
+      })
+      .popover(isPresented: $isLongPressing, content: {
+        TodoListPopOver(isShow: $isLongPressing, viewModel: viewModel, todo: todo)
       })
       .sheet(isPresented: $isShowEditView) {
         EditView(
           todo: Todo(id: todo.id, title: todo.title, content: todo.content, date: todo.date, status: todo.status),
           isShow: $isShowEditView,
           viewModel: viewModel.editViewModel)
-      }
-      .popover(isPresented: $isLongPressing) {
-        TodoListPopOver(isShow: $isLongPressing, todo: todo, updata: updata)
       }
   }
 }

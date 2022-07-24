@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct EditView: View {
-  @State private var nonEditable: Bool = true
-  @State var todo: Todo = Todo(title: "", content: "")
+  @State var todo: Todo = Todo(title: "??", content: "??")
   @Binding var isShow: Bool
   @ObservedObject var viewModel: EditViewModel
   
@@ -22,17 +21,17 @@ struct EditView: View {
   var body: some View {
     NavigationView {
       DetailView(todo: $todo)
-        .disabled(nonEditable)
+        .disabled(viewModel.nonEditable)
         .toolbar {
           ToolbarItem(placement: .navigationBarLeading) {
             Button {
-              if nonEditable == true {
-                nonEditable = false
+              if viewModel.nonEditable == true {
+                viewModel.nonEditable = false
               } else {
                 isShow = false
               }
             } label: {
-              nonEditable ? Text("Edit") : Text("Calcel")
+              viewModel.nonEditable ? Text("Edit") : Text("Calcel")
             }
           }
           ToolbarItem(placement: .navigationBarTrailing) {

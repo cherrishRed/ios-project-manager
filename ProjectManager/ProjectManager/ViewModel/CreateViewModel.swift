@@ -6,11 +6,14 @@
 //
 
 import Foundation
+import SwiftUI
 
 class CreateViewModel: ObservableObject {
   var create: (Todo) -> Void
-  
-  init(create: @escaping (Todo) -> Void) {
+  var cancel: () -> Void
+  init(create: @escaping (Todo) -> Void, cancel: @escaping () -> Void) {
     self.create = create
+    self.cancel = cancel
+    
   }
 }

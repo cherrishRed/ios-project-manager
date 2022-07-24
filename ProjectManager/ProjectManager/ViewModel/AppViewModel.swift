@@ -10,12 +10,19 @@ import SwiftUI
 
 class AppViewModel: ObservableObject {
   var todoService: TodoService = TodoService()
+  @Published var isShowDetailView: Bool = false
   @Published private var todoList: [Todo] = []
   
-  lazy var listViewModel = ListViewModel(todoService: todoService, todoList: todoList)
+  lazy var toodoListViewModel = ListViewModel(todoService: todoService, status: .todo, todoList: todoList) { self.changeStatus(status: $0, todo: $1) }
+  lazy var doingListViewModel = ListViewModel(todoService: todoService, status: .doing, todoList: todoList) { self.changeStatus(status: $0, todo: $1) }
+  lazy var doneListViewModel = ListViewModel(todoService: todoService, status: .done, todoList: todoList) { self.changeStatus(status: $0, todo: $1) }
+  
   lazy var createViewModel = CreateViewModel(create: { [self] todo in
-    self.todoService.creat(todo: todo)
+  self.todoService.creat(todo: todo)
     todoList = todoService.read()
+    self.isShowDetailView = false
+  }, cancel: {
+    self.isShowDetailView = false
   })
   
   init() {
@@ -24,7 +31,11 @@ class AppViewModel: ObservableObject {
   
   func changeStatus(status: Status, todo: Todo) {
     todoService.updateStatus(status: status, todo: todo)
-    
     todoList = todoService.read()
   }
+  
+  func nothing() {
+    
+  }
+  
 }
